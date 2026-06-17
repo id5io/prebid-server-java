@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.prebid.server.hooks.modules</groupId>
+        <artifactId>all-modules</artifactId>
+        <version>3.43.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>io.id5.prebid.server.hooks.modules</groupId>
+    <artifactId>id5-user-id</artifactId>
+    <version>${revision}</version>
+
+    <name>ID5 User ID</name>
+    <description>ID5 User ID Prebid Server module</description>
+    <url>https://github.com/id5io/prebid-server-java</url>
+
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>id5</id>
+            <name>ID5 Technology Ltd.</name>
+            <email>dev@id5.io</email>
+            <organization>ID5 Technology Ltd.</organization>
+            <organizationUrl>https://id5.io</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:id5io/prebid-server-java.git</connection>
+        <developerConnection>scm:git:git@github.com:id5io/prebid-server-java.git</developerConnection>
+        <url>https://github.com/id5io/prebid-server-java</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <revision>0.0-localtest</revision>
+        <skipPublishing>true</skipPublishing>
+    </properties>
+
+    <dependencies>
+        <!-- Consumers bring their own prebid-server runtime. Version tracks
+             the parent's pbs version (${project.parent.version}) automatically. -->
+        <dependency>
+            <groupId>org.prebid</groupId>
+            <artifactId>prebid-server</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--   TEST  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <flattenMode>oss</flattenMode>
+                    <pomElements>
+                        <!-- Strip build section from the deployed pom; the central-publishing
+                             plugin matters only during our deploy, not for consumers. -->
+                        <build>remove</build>
+                    </pomElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.10.0</version>
+                <configuration>
+                    <!-- Lombok-generated classes (e.g. PrebidServerMetadataBuilder) aren't visible
+                         to javadoc since it skips annotation processing. Don't fail the build. -->
+                    <failOnError>false</failOnError>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.7</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                    <skipPublishing>${skipPublishing}</skipPublishing>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
