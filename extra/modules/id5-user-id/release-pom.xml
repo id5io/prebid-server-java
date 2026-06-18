@@ -97,6 +97,32 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- Strip "-SNAPSHOT" from prebid-server dep in the flattened pom.
+                     Local build needs to link against the SNAPSHOT artifact (provided scope),
+                     but Sonatype Central rejects any -SNAPSHOT in published pom dependencies.
+                     Runs AFTER flatten (process-resources) and BEFORE gpg sign (verify),
+                     so signatures match the modified content. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>strip-snapshot-from-flattened-pom</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <replace file="${project.basedir}/.flattened-pom.xml"
+                                         token="-SNAPSHOT"
+                                         value=""/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.3.1</version>
